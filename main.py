@@ -115,6 +115,15 @@ class ManualInjectPlugin(Star):
                 flags=re.DOTALL,
             )
 
+            # persistent 模式使用带后缀的标签名，与 once 模式彻底隔离
+            p_tag_name = f"{tag_name} auto-injected"
+            p_header = f"<{p_tag_name}>"
+            p_footer = f"</{p_tag_name}>"
+            p_cleanup_re = re.compile(
+                re.escape(p_header) + r".*?" + re.escape(p_footer),
+                flags=re.DOTALL,
+            )
+
             self._entries[name] = {
                 "tag_name": tag_name,
                 "content": content,
@@ -122,6 +131,10 @@ class ManualInjectPlugin(Star):
                 "header": header,
                 "footer": footer,
                 "cleanup_re": cleanup_re,
+                "p_tag_name": p_tag_name,
+                "p_header": p_header,
+                "p_footer": p_footer,
+                "p_cleanup_re": p_cleanup_re,
             }
 
     # -------------------------------------------------------------------
@@ -148,11 +161,16 @@ class ManualInjectPlugin(Star):
             lines = []
             for name, entry in self._entries.items():
                 status = self._active.get(name)
-                if status:
-                    marker = f"[{status}]"
+                if status == "persistent":
+                    marker = "[persistent]"
+                    display_tag = entry["p_tag_name"]
+                elif status == "once":
+                    marker = "[once]"
+                    display_tag = entry["tag_name"]
                 else:
                     marker = "[off]"
-                lines.append(f"  {marker} {name} -> <{entry['tag_name']}>")
+                    display_tag = entry["tag_name"]
+                lines.append(f"  {marker} {name} -> <{display_tag}>")
 
             if lines:
                 yield event.plain_result("【手动指令注入】条目列表:\n" + "\n".join(lines))
@@ -169,7 +187,6 @@ class ManualInjectPlugin(Star):
             return
 
         entry = self._entries[entry_name]
-        tag_name = entry["tag_name"]
 
         # --- mpinject <name> stop ---
         if action == "stop":
@@ -181,8 +198,8 @@ class ManualInjectPlugin(Star):
 
             mode = self._active.pop(entry_name)
             if mode == "persistent":
-                self._persistent_tags.discard(tag_name)
-                self._pending_cleanup.add(tag_name)
+                self._persistent_tags.discard(entry["p_tag_name"])
+                self._pending_cleanup.add(entry["p_tag_name"])
             # once 模式的 stop 没有意义（已经注入且不再活跃），
             # 但也不报错，直接从 _active 移除即可
 
@@ -193,8 +210,8 @@ class ManualInjectPlugin(Star):
         if action == "once":
             # 如果之前在 persistent 模式，先清理
             if self._active.get(entry_name) == "persistent":
-                self._persistent_tags.discard(tag_name)
-                self._pending_cleanup.add(tag_name)
+                self._persistent_tags.discard(entry["p_tag_name"])
+                self._pending_cleanup.add(entry["p_tag_name"])
 
             self._active[entry_name] = "once"
             yield event.plain_result(f"【手动指令注入】「{entry_name}」已激活 (once)。")
@@ -209,8 +226,8 @@ class ManualInjectPlugin(Star):
 
         # --- mpinject <name>（持续模式）---
         self._active[entry_name] = "persistent"
-        self._persistent_tags.add(tag_name)
-        self._pending_cleanup.discard(tag_name)
+        self._persistent_tags.add(entry["p_tag_name"])
+        self._pending_cleanup.discard(entry["p_tag_name"])
         yield event.plain_result(f"【手动指令注入】「{entry_name}」已激活 (persistent)。")
 
     # -------------------------------------------------------------------
@@ -360,8 +377,10 @@ class ManualInjectPlugin(Star):
             else:
                 req.prompt = prompt + "\n\n" + text
 
-    def _format_entry(self, entry: dict[str, Any]) -> str:
+    def _format_entry(self, entry: dict[str, Any], mode: str = "once") -> str:
         """将条目格式化为 XML 标签包裹的字符串。"""
+        if mode == "persistent":
+            return f"{entry['p_header']}\n{entry['content']}\n{entry['p_footer']}\n"
         return f"{entry['header']}\n{entry['content']}\n{entry['footer']}\n"
 
     # -------------------------------------------------------------------
@@ -385,8 +404,13 @@ class ManualInjectPlugin(Star):
         try:
             total_removed = 0
             for entry in self._entries.values():
-                if entry["tag_name"] in tags_to_clean:
-                    removed = self._clean_tag_from_request(req, entry)
+                if entry["p_tag_name"] in tags_to_clean:
+                    p_entry = {
+                        "cleanup_re": entry["p_cleanup_re"],
+                        "header": entry["p_header"],
+                        "footer": entry["p_footer"],
+                    }
+                    removed = self._clean_tag_from_request(req, p_entry)
                     total_removed += removed
 
             # pending_cleanup 完成使命，清空
@@ -423,7 +447,7 @@ class ManualInjectPlugin(Star):
                 if not entry:
                     continue
 
-                formatted = self._format_entry(entry)
+                formatted = self._format_entry(entry, mode)
                 self._inject_text(req, formatted, entry["position"])
 
                 logger.debug(
