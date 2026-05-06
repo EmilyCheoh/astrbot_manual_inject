@@ -1,0 +1,312 @@
+{
+    "entry_1": {
+        "description": "条目 1",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    },
+    "entry_2": {
+        "description": "条目 2",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    },
+    "entry_3": {
+        "description": "条目 3",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    },
+    "entry_4": {
+        "description": "条目 4",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    },
+    "entry_5": {
+        "description": "条目 5",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    },
+    "entry_6": {
+        "description": "条目 6",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    },
+    "entry_7": {
+        "description": "条目 7",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    },
+    "entry_8": {
+        "description": "条目 8",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    },
+    "entry_9": {
+        "description": "条目 9",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    },
+    "entry_10": {
+        "description": "条目 10",
+        "type": "object",
+        "items": {
+            "name": {
+                "description": "条目名称",
+                "hint": "mpinject 指令中的关键词，如「画画」「rp」。",
+                "type": "string",
+                "default": ""
+            },
+            "tag_name": {
+                "description": "标签名称",
+                "hint": "注入时包裹内容的标签名，如 Our Visual Descriptions。不能包含 < > 或换行。",
+                "type": "string",
+                "default": ""
+            },
+            "content": {
+                "description": "注入内容",
+                "hint": "注入的实际文本。",
+                "type": "text",
+                "default": ""
+            },
+            "position": {
+                "description": "注入位置",
+                "hint": "user_message_before: 用户消息前；user_message_after: 用户消息后；system_prompt: 系统提示词。",
+                "type": "string",
+                "default": "user_message_after",
+                "options": ["user_message_before", "user_message_after", "system_prompt"]
+            }
+        }
+    }
+}
