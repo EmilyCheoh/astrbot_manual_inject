@@ -67,7 +67,7 @@ class ManualInjectPlugin(Star):
         self._pending_cleanup: set[str] = set()
 
         logger.info(
-            f"【手动注入】初始化完成，已加载 {len(self._entries)} 个条目: "
+            f"【手动指令注入】初始化完成，已加载 {len(self._entries)} 个条目: "
             f"{', '.join(self._entries.keys()) if self._entries else '(无)'}"
         )
 
@@ -97,13 +97,13 @@ class ManualInjectPlugin(Star):
 
             if TAG_NAME_INVALID.search(tag_name):
                 logger.warning(
-                    f"【手动注入】{key} 标签名称包含非法字符 (<, >, 换行)，跳过"
+                    f"【手动指令注入】{key} 标签名称包含非法字符 (<, >, 换行)，跳过"
                 )
                 continue
 
             if position not in VALID_POSITIONS:
                 logger.warning(
-                    f"【手动注入】{key} 注入位置 '{position}' 无效，"
+                    f"【手动指令注入】{key} 注入位置 '{position}' 无效，"
                     f"回退到 user_message_after"
                 )
                 position = "user_message_after"
@@ -135,7 +135,7 @@ class ManualInjectPlugin(Star):
         """处理 mpinject 指令。"""
         if not entry_name:
             yield event.plain_result(
-                "用法:\n"
+                "【手动指令注入】用法:\n"
                 "  mpinject <条目名>        持续注入\n"
                 "  mpinject <条目名> once   一次性注入\n"
                 "  mpinject <条目名> stop   停止注入\n"
@@ -143,7 +143,7 @@ class ManualInjectPlugin(Star):
             )
             return
 
-        # --- mi list ---
+        # --- mpinject list ---
         if entry_name == "list":
             lines = []
             for name, entry in self._entries.items():
@@ -155,27 +155,27 @@ class ManualInjectPlugin(Star):
                 lines.append(f"  {marker} {name} -> <{entry['tag_name']}>")
 
             if lines:
-                yield event.plain_result("条目列表:\n" + "\n".join(lines))
+                yield event.plain_result("【手动指令注入】条目列表:\n" + "\n".join(lines))
             else:
-                yield event.plain_result("没有已配置的条目。")
+                yield event.plain_result("【手动指令注入】没有已配置的条目。")
             return
 
         # --- 条目不存在 ---
         if entry_name not in self._entries:
             available = ", ".join(self._entries.keys()) if self._entries else "无"
             yield event.plain_result(
-                f"未找到条目「{entry_name}」\n可用条目: {available}"
+                f"【手动指令注入】未找到条目「{entry_name}」\n可用条目: {available}"
             )
             return
 
         entry = self._entries[entry_name]
         tag_name = entry["tag_name"]
 
-        # --- mi <name> stop ---
+        # --- mpinject <name> stop ---
         if action == "stop":
             if entry_name not in self._active:
                 yield event.plain_result(
-                    f"「{entry_name}」当前未激活。"
+                    f"【手动指令注入】「{entry_name}」当前未激活。"
                 )
                 return
 
@@ -186,10 +186,10 @@ class ManualInjectPlugin(Star):
             # once 模式的 stop 没有意义（已经注入且不再活跃），
             # 但也不报错，直接从 _active 移除即可
 
-            yield event.plain_result(f"「{entry_name}」已停止。")
+            yield event.plain_result(f"【手动指令注入】「{entry_name}」已停止。")
             return
 
-        # --- mi <name> once ---
+        # --- mpinject <name> once ---
         if action == "once":
             # 如果之前在 persistent 模式，先清理
             if self._active.get(entry_name) == "persistent":
@@ -197,14 +197,21 @@ class ManualInjectPlugin(Star):
                 self._pending_cleanup.add(tag_name)
 
             self._active[entry_name] = "once"
-            yield event.plain_result(f"「{entry_name}」已激活 (once)。")
+            yield event.plain_result(f"【手动指令注入】「{entry_name}」已激活 (once)。")
             return
 
-        # --- mi <name>（持续模式）---
+        # --- 无效操作 ---
+        if action:
+            yield event.plain_result(
+                f"【手动指令注入】未知操作「{action}」。可用: once, stop"
+            )
+            return
+
+        # --- mpinject <name>（持续模式）---
         self._active[entry_name] = "persistent"
         self._persistent_tags.add(tag_name)
         self._pending_cleanup.discard(tag_name)
-        yield event.plain_result(f"「{entry_name}」已激活 (persistent)。")
+        yield event.plain_result(f"【手动指令注入】「{entry_name}」已激活 (persistent)。")
 
     # -------------------------------------------------------------------
     # 清理逻辑
@@ -387,12 +394,12 @@ class ManualInjectPlugin(Star):
 
             if total_removed > 0:
                 logger.debug(
-                    f"【手动注入】[清理] 已清理 {total_removed} 处历史注入"
+                    f"【手动指令注入】[清理] 已清理 {total_removed} 处历史注入"
                 )
 
         except Exception as e:
             logger.error(
-                f"【手动注入】[清理] 发生错误: {e}", exc_info=True
+                f"【手动指令注入】[清理] 发生错误: {e}", exc_info=True
             )
 
     @filter.on_llm_request(priority=-500)
@@ -420,7 +427,7 @@ class ManualInjectPlugin(Star):
                 self._inject_text(req, formatted, entry["position"])
 
                 logger.debug(
-                    f"【手动注入】[注入] {name} ({mode}) "
+                    f"【手动指令注入】[注入] {name} ({mode}) "
                     f"-> {entry['position']}"
                 )
 
@@ -433,7 +440,7 @@ class ManualInjectPlugin(Star):
 
         except Exception as e:
             logger.error(
-                f"【手动注入】[注入] 发生错误: {e}", exc_info=True
+                f"【手动指令注入】[注入] 发生错误: {e}", exc_info=True
             )
 
     # -------------------------------------------------------------------
@@ -445,4 +452,4 @@ class ManualInjectPlugin(Star):
         self._active.clear()
         self._persistent_tags.clear()
         self._pending_cleanup.clear()
-        logger.info("【手动注入】插件已停止")
+        logger.info("【手动指令注入】插件已停止")
