@@ -9,9 +9,9 @@ ManualInject - 手动指令注入插件
 指令：
   mpinject <条目名>          持续注入，直到 mpinject <条目名> stop
   mpinject <条目名> once     一次性注入，永久保留
-  mpinject <条目名> stop     停止持续注入并清理上一轮痕迹 (也接受 off/exit/end/quit/close)
+  mpinject <条目名> stop     停止持续注入并清理上一轮痕迹 (也接受 off/exit/end/quit/close in case Felis Abyssalis forgot the actual command)
   mpinject stop              一键停止所有激活中的条目 (也接受 off/exit/end/quit/close)
-  mpinject list              列出所有条目及当前激活状态
+  mpinject list              列出所有条目及当前激活状态 (也接受 status/ls/show/all)
   mpinject help             显示帮助列表
 
 与 PromptTags / LivingMemory / FirstWindowInject 兼容：
@@ -40,6 +40,9 @@ VALID_POSITIONS = ("user_message_before", "user_message_after", "system_prompt")
 
 # stop 指令的同义词——小猫打哪个都行
 STOP_SYNONYMS = {"stop", "off", "exit", "end", "quit", "close"}
+
+# list 指令的同义词——同上
+LIST_SYNONYMS = {"list", "status", "ls", "show", "all"}
 
 
 @register(
@@ -158,12 +161,13 @@ class ManualInjectPlugin(Star):
                 "  mpinject <条目名> once   一次性注入\n"
                 "  mpinject <条目名> stop   停止注入\n"
                 "  mpinject stop            一键停止所有注入\n"
-                "  mpinject list            列出所有条目"
+                "  mpinject list            列出所有条目\n"
+                "    (list 也接受 status/ls/show/all)"
             )
             return
 
-        # --- mpinject list ---
-        if entry_name == "list":
+        # --- mpinject list/status/ls/show/all ---
+        if entry_name.lower() in LIST_SYNONYMS:
             lines = []
             for name, entry in self._entries.items():
                 status = self._active.get(name)
