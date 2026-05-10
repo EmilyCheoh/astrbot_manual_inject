@@ -1,5 +1,5 @@
 name: astrbot_plugin_manual_inject
-display_name: "手动指令注入"
+display_name: "📥手动指令注入"
 description: 手动指令注入插件 - 通过 mpinject 指令控制向 LLM 请求注入预定义内容
 version: 1.0.0
 author: Felis Abyssalis
