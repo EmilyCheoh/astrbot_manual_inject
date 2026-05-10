@@ -1,5 +1,8 @@
 # Changelog
 
+## may 10 
+added stop all command
+
 ## v1.0.0
 
 ### Added

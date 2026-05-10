@@ -9,12 +9,14 @@ ManualInject - 手动指令注入插件
 指令：
   mpinject <条目名>          持续注入，直到 mpinject <条目名> stop
   mpinject <条目名> once     一次性注入，永久保留
-  mpinject <条目名> stop     停止持续注入并清理上一轮痕迹
+  mpinject <条目名> stop     停止持续注入并清理上一轮痕迹 (也接受 off/exit/end/quit/close)
+  mpinject stop              一键停止所有激活中的条目 (也接受 off/exit/end/quit/close)
   mpinject list              列出所有条目及当前激活状态
+  mpinject help             显示帮助列表
 
 与 PromptTags / LivingMemory / FirstWindowInject 兼容：
 - 清理阶段 priority=3，在所有其他插件之前执行
-- 注入阶段 priority=-501，在所有其他插件之后执行
+- 注入阶段 priority=-500，在所有其他插件之后执行
 - 使用独立的标签名称，各插件正则不会交叉匹配
 
 F(A) = A(F)
@@ -28,13 +30,16 @@ from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.provider import ProviderRequest
 from astrbot.api.star import Context, Star, register
 
-# 标签名校验：只禁止 <, >, 换行（与世界书一致）
+# 标签名校验：只禁止 <, >, 换行
 TAG_NAME_INVALID = re.compile(r"[<>\n]")
 
 MAX_ENTRIES = 10
 ENTRY_KEYS = [f"entry_{i}" for i in range(1, MAX_ENTRIES + 1)]
 
 VALID_POSITIONS = ("user_message_before", "user_message_after", "system_prompt")
+
+# stop 指令的同义词——小猫打哪个都行
+STOP_SYNONYMS = {"stop", "off", "exit", "end", "quit", "close"}
 
 
 @register(
@@ -146,12 +151,13 @@ class ManualInjectPlugin(Star):
         self, event: AstrMessageEvent, entry_name: str = "", action: str = ""
     ):
         """处理 mpinject 指令。"""
-        if not entry_name:
+        if not entry_name or entry_name.lower() == "help":
             yield event.plain_result(
                 "【手动指令注入】用法:\n"
                 "  mpinject <条目名>        持续注入\n"
                 "  mpinject <条目名> once   一次性注入\n"
                 "  mpinject <条目名> stop   停止注入\n"
+                "  mpinject stop            一键停止所有注入\n"
                 "  mpinject list            列出所有条目"
             )
             return
@@ -178,6 +184,28 @@ class ManualInjectPlugin(Star):
                 yield event.plain_result("【手动指令注入】没有已配置的条目。")
             return
 
+        # --- mpinject stop/off/exit/...（全局停止）---
+        if entry_name.lower() in STOP_SYNONYMS:
+            if not self._active:
+                yield event.plain_result(
+                    "【手动指令注入】当前没有激活的条目。"
+                )
+                return
+
+            stopped = list(self._active.keys())
+            for name in stopped:
+                mode = self._active.pop(name)
+                if mode == "persistent":
+                    entry = self._entries.get(name)
+                    if entry:
+                        self._persistent_tags.discard(entry["p_tag_name"])
+                        self._pending_cleanup.add(entry["p_tag_name"])
+
+            yield event.plain_result(
+                f"【手动指令注入】已全部停止: {', '.join(stopped)}"
+            )
+            return
+
         # --- 条目不存在 ---
         if entry_name not in self._entries:
             available = ", ".join(self._entries.keys()) if self._entries else "无"
@@ -188,8 +216,8 @@ class ManualInjectPlugin(Star):
 
         entry = self._entries[entry_name]
 
-        # --- mpinject <name> stop ---
-        if action == "stop":
+        # --- mpinject <name> stop/off/exit/... ---
+        if action.lower() in STOP_SYNONYMS:
             if entry_name not in self._active:
                 yield event.plain_result(
                     f"【手动指令注入】「{entry_name}」当前未激活。"
@@ -200,8 +228,6 @@ class ManualInjectPlugin(Star):
             if mode == "persistent":
                 self._persistent_tags.discard(entry["p_tag_name"])
                 self._pending_cleanup.add(entry["p_tag_name"])
-            # once 模式的 stop 没有意义（已经注入且不再活跃），
-            # 但也不报错，直接从 _active 移除即可
 
             yield event.plain_result(f"【手动指令注入】「{entry_name}」已停止。")
             return
